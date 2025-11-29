@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>Registro de Paciente</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilo customizado para a fonte Inter */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; 
+        }
+        /* Estilos para os Radio Tags (Destino do Material) */
+        .radio-tag-material input[type="radio"] {
+            display: none;
+        }
+        .radio-tag-material label {
+            display: block;
+            padding: 0.6rem 1.2rem; 
+            border: 1px solid #cbd5e1; 
+            border-radius: 9999px; 
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            font-weight: 500;
+            font-size: 0.875rem; 
+            color: #475569; 
+            background-color: #ffffff;
+            white-space: nowrap; 
+        }
+        .radio-tag-material input[type="radio"]:checked + label {
+            background-color: #4f46e5; 
+            color: #ffffff;
+            border-color: #4f46e5;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Estilo para a tabela de listagem completa, garantindo responsividade */
+        #list-table th, #list-table td {
+            white-space: nowrap; 
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
+</head>
+<body class="flex justify-center items-start min-h-screen p-4 bg-gray-50">
+    <div class="container w-full sm:max-w-xl bg-white p-6 sm:p-8 rounded-xl shadow-2xl border border-gray-100 mt-8" id="main-content">
+        
+        <header class="text-center mb-8 border-b pb-4 border-gray-200">
+            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">
+                <span class="text-indigo-600">Registro</span> de Paciente
+            </h1>
+            <p class="text-sm text-gray-500 mt-1" id="header-subtitle">Use seu email e senha para acessar.</p>
+        </header>
+
+        <div id="auth-container" class="space-y-6">
+            
+            <form id="loginForm" class="space-y-6 p-4 border border-indigo-200 rounded-lg bg-indigo-50/50">
+                <h2 class="text-xl font-bold text-gray-700 text-center">Acesso ao Sistema</h2>
+                
+                <div>
+                    <label for="loginEmail" class="block text-sm font-medium text-gray-700 mb-1">E-mail:</label>
+                    <input type="email" id="loginEmail" name="email" required
+                            placeholder="seu.email@exemplo.com"
+                            class="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                
+                <div>
+                    <label for="loginPassword" class="block text-sm font-medium text-gray-700 mb-1">Senha:</label>
+                    <input type="password" id="loginPassword" name="senha" required
+                            placeholder="********"
+                            class="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                
+                <button type="submit" id="loginButton"
+                        class="w-full py-3 bg-indigo-600 text-white font-bold rounded-lg shadow-md hover:bg-indigo-700 transition duration-200 disabled:bg-gray-400">
+                    Entrar
+                </button>
+                
+                <div id="loginStatus" class="mt-4 text-center font-semibold p-3 rounded-lg transition-all duration-300"></div>
+            </form>
+
+            <p class="text-center text-sm text-gray-500">
+                Não tem cadastro? 
+                <button type="button" id="showRegisterButton" class="font-semibold text-indigo-600 hover:text-indigo-800">
+                    Clique aqui para Cadastrar
+                </button>
+            </p>
+
+            <form id="registerForm" class="hidden space-y-6 p-4 border border-green-200 rounded-lg bg-green-50/50">
+                <h2 class="text-xl font-bold text-gray-700 text-center">Novo Cadastro</h2>
+                
+                <div>
+                    <label for="registerName" class="block text-sm font-medium text-gray-700 mb-1">Nome Completo:</label>
+                    <input type="text" id="registerName" name="nome" required
+                            placeholder="Seu nome"
+                            class="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                    <div>
+                    <label for="registerEmail" class="block text-sm font-medium text-gray-700 mb-1">E-mail:</label>
+                    <input type="email" id="registerEmail" name="email" required
+                            placeholder="seu.email@exemplo.com"
+                            class="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                
+                <div>
+                    <label for="registerPassword" class="block text-sm font-medium text-gray-700 mb-1">
+                        Crie uma Senha (Mín. 6 caracteres e **deve conter pelo menos uma letra**):
+                    </label>
+                    <input type="password" id="registerPassword" name="senha" minlength="6" required
+                            placeholder="********"
+                            class="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                
+                <button type="submit" id="registerButton"
+                        class="w-full py-3 bg-green-600 text-white font-bold rounded-lg shadow-md hover:bg-green-700 transition duration-200 disabled:bg-gray-400">
+                    Cadastrar e Acessar
+                </button>
+                
+                <div id="registerStatus" class="mt-4 text-center font-semibold p-3 rounded-lg transition-all duration-300"></div>
+                
+                <button type="button" id="backToLoginButton" class="w-full py-2 text-indigo-600 font-semibold hover:text-indigo-800">
+                    Voltar para Login
+                </button>
+            </form>
+        </div>
+
+
+        <form id="contactForm" class="hidden space-y-6"> 
+            
+            <fieldset class="p-4 border border-indigo-100 rounded-lg bg-indigo-50/50">
+                <legend class="text-base font-bold text-gray-700 px-2">Dados do Paciente e Contato</legend>
+
+                <div class="space-y-4">
+                    <div>
+                        <label for="nome" class="block text-sm font-medium text-gray-700 mb-1">
+                            Solicitante/Responsável:
+                        </label>
+                        <input type="text" id="nome_solicitante" name="nome_solicitante" required 
+                                placeholder="Nome do solicitante logado"
+                                readonly 
+                                class="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-gray-100 cursor-not-allowed">
+                    </div>
+
+                    <div>
+                        <label for="nome_paciente" class="block text-sm font-medium text-gray-700 mb-1">
+                            Nome do Paciente:
+                        </label>
+                        <input type="text" id="nome_paciente" name="nome_paciente" required 
+                                placeholder="Nome completo do paciente"
+                                class="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4"> 
+                    
+                    <div>
+                        <label for="data_nascimento" class="block text-sm font-medium text-gray-700 mb-1">
+                            Data de Nascimento:
+                        </label>
+                        <input type="date" id="data_nascimento" name="data_nascimento" required 
+                                class="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+                            E-mail de Contato:
+                        </label>
+                        <input type="email" id="email_solicitante" name="email_solicitante" required 
+                                placeholder="Email do solicitante logado"
+                                readonly
+                                class="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-gray-100 cursor-not-allowed">
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="p-4 border border-gray-200 rounded-lg">
+                       <legend class="text-base font-bold text-gray-700 px-2">Detalhes da Solicitação</legend>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"> 
+                    <div>
+                        <label for="quantidade" class="block text-sm font-medium text-gray-700 mb-1">
+                            Quantidade (Materiais/Acessos):
+                        </label>
+                        <input type="number" id="quantidade" name="quantidade" min="1" value="1" required 
+                                class="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+
+                    <div>
+                        <label for="setor_interesse" class="block text-sm font-medium text-gray-700 mb-1">
+                            Setor/Serviço de Interesse:
+                        </label>
+                        <select id="setor_interesse" name="setor_interesse" required
+                                     class="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm bg-white appearance-none focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="" disabled selected>--- Selecione o Setor ---</option>
+                            <option value="FISIOTERAPIA">FISIOTERAPIA</option>
+                            <option value="FONOAUDIOLOGIA">FONOAUDIOLOGIA</option>
+                            <option value="HEMODIÁLISE">HEMODIÁLISE</option>
+                            <option value="HOSPITAL - DIA">HOSPITAL - DIA</option>
+                            <option value="PRONTO SOCORRO - PS">PRONTO SOCORRO - PS</option>
+                            <option value="LABORATÓRIO">LABORATÓRIO</option>
+                            <option value="PRONTO SOCORRO OBSTÉTRICO - PSO">PS OBSTÉTRICO - PSO</option>
+                            <option value="PSICOLOGIA">PSICOLOGIA</option>
+                            <option value="RAIO X">RAIO X</option>
+                            <option value="SALA DE PEQUENOS PROCEDIMENTOS">SALA DE PEQUENOS PROCEDIMENTOS</option>
+                            <option value="TOMOGRAFIA">TOMOGRAFIA</option>
+                            <option value="ULTRASSONOGRAFIA">ULTRASSONOGRAFIA</option>
+                            <option value="UTI ADULTO">UTI ADULTO</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="pt-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Destino do Material:
+                    </label>
+                    <div class="flex flex-wrap gap-2"> 
+                        
+                        <div class="radio-tag-material">
+                            <input type="radio" id="encaminhado_externo" name="destino_material" value="PARA O SETOR" required>
+                            <label for="encaminhado_externo">PARA O SETOR</label>
+                        </div>
+                        <div class="radio-tag-material">
+                            <input type="radio" id="analise_interna" name="destino_material" value="PARA O PACIENTE" required>
+                            <label for="analise_interna">PARA O PACIENTE</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <label for="mensagem" class="block text-sm font-medium text-gray-700 mb-1">
+                        MATERIAL OU INSTRUMENTAL:
+                    </label>
+                    <textarea id="mensagem" name="mensagem" rows="3" required 
+                                    placeholder="Detalhes importantes sobre a solicitação..."
+                                    class="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 resize-none"></textarea>
+                </div>
+            </fieldset>
+
+            <div class="pt-4 space-y-3">
+                <button type="submit" id="submitButton"
+                        class="w-full py-3 bg-indigo-600 text-white font-bold rounded-lg shadow-md hover:bg-indigo-700 transition duration-200 disabled:bg-gray-400">
+                    <span class="text-lg">Enviar Registro</span>
+                </button>
+                
+                <button type="button" id="viewListButton"
+                        class="w-full py-2 bg-gray-100 text-indigo-600 border border-indigo-400 font-bold rounded-lg shadow-sm hover:bg-gray-200 transition duration-200">
+                    Ver Meus Registros Enviados
+                </button>
+                
+                <div id="status" class="mt-4 text-center font-semibold p-3 rounded-lg transition-all duration-300"></div>
+            </div>
+        </form>
+        
+        <div id="submission-confirmation" class="hidden space-y-4">
+            <div class="bg-green-50 border-l-4 border-green-400 p-4 rounded-md">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.857a.75.75 0 00-1.07.106L8 12.189l-1.92-1.92a.75.75 0 10-1.06 1.06l2.5 2.5a.75.75 0 001.06 0l4-4a.75.75 0 00-.106-1.07z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-green-800">
+                            Registro enviado com sucesso! 🎉
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <h2 class="text-xl font-bold text-gray-700 border-b pb-2">Dados Registrados</h2>
+            
+            <div class="overflow-x-auto border border-gray-200 rounded-lg">
+                <table class="min-w-full divide-y divide-gray-200 bg-white" id="data-table">
+                    <tbody class="divide-y divide-gray-100">
+                        </tbody>
+                </table>
+            </div>
+
+            <div class="space-y-3">
+                <button type="button" id="newRecordButton" 
+                        class="w-full py-2 bg-indigo-600 text-white font-bold rounded-lg shadow-md hover:bg-indigo-700 transition duration-200">
+                    Fazer Novo Registro
+                </button>
+                <button type="button" id="viewListButton2"
+                        class="w-full py-2 bg-gray-100 text-indigo-600 border border-indigo-400 font-bold rounded-lg shadow-sm hover:bg-gray-200 transition duration-200">
+                    Ver Meus Registros Enviados
+                </button>
+            </div>
+        </div>
+
+        <div id="full-list-container" class="hidden space-y-4">
+            <h2 class="text-2xl font-extrabold text-indigo-700 tracking-tight border-b pb-2" id="list-title">
+                Meus Registros
+            </h2>
+            
+            <div id="list-status" class="text-center font-semibold p-3 rounded-lg bg-blue-100 text-blue-700">
+                Carregando dados...
+            </div>
+
+            <div class="overflow-x-auto border border-gray-200 rounded-lg" id="list-table-wrapper">
+                <table class="min-w-full divide-y divide-gray-200 bg-white" id="list-table">
+                    </table>
+            </div>
+
+            <div id="pagination-controls" class="flex justify-between items-center mt-4">
+                <p id="pagination-info" class="text-sm text-gray-600"></p>
+                <div class="flex space-x-2">
+                    <button id="prev-page-button" 
+                            class="px-4 py-2 border rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Anterior
+                    </button>
+                    <button id="next-page-button" 
+                            class="px-4 py-2 border rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Próxima
+                    </button>
+                </div>
+            </div>
+            
+            <button type="button" id="backToFormButton"
+                    class="w-full py-2 bg-gray-200 text-gray-700 font-bold rounded-lg shadow-md hover:bg-gray-300 transition duration-200">
+                Voltar ao Formulário
+            </button>
+        </div>
+        </div>
+
+<script>
+    // 🚨 OBRIGATÓRIO: SUBSTITUA ESTA VARIÁVEL PELA SUA URL REAL DO GOOGLE APPS SCRIPT ATUALIZADA 🚨
+    const GOOGLE_SHEETS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzLYujRQnl0V1ct_NB02VcLjH5MfTCO8G9MtYUdADjuPJTR66-AEPLilOcxbwek59dg/exec';
+
+    // Elementos do Formulário de Paciente/Lista
+    const form = document.getElementById('contactForm');
+    const submitButton = document.getElementById('submitButton');
+    const viewListButton = document.getElementById('viewListButton');
+    const viewListButton2 = document.getElementById('viewListButton2');
+    const backToFormButton = document.getElementById('backToFormButton');
+    const confirmationDiv = document.getElementById('submission-confirmation');
+    const dataTableBody = document.querySelector('#data-table tbody');
+    const fullListContainer = document.getElementById('full-list-container');
+    const listStatusDiv = document.getElementById('list-status');
+    const listTable = document.getElementById('list-table');
+    const headerSubtitle = document.getElementById('header-subtitle');
+    const mainContent = document.getElementById('main-content');
+    const statusDiv = document.getElementById('status');
+    const listTitle = document.getElementById('list-title');
+    
+    // ✅ NOVO: Variável para o botão de Novo Registro (id="newRecordButton")
+    const newRecordButton = document.getElementById('newRecordButton'); 
+    
+    // Elementos de Paginação
+    const paginationControls = document.getElementById('pagination-controls');
+    const paginationInfo = document.getElementById('pagination-info');
+    const prevPageButton = document.getElementById('prev-page-button');
+    const nextPageButton = document.getElementById('next-page-button');
+    
+    // Elementos de Autenticação
+    const authContainer = document.getElementById('auth-container');
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const loginStatusDiv = document.getElementById('loginStatus');
+    const registerStatusDiv = document.getElementById('registerStatus');
+    const nomeSolicitanteInput = document.getElementById('nome_solicitante');
+    const emailSolicitanteInput = document.getElementById('email_solicitante');
+
+    // VARIÁVEL GLOBAL PARA GUARDAR DADOS DO USUÁRIO LOGADO E ESTADO DA PAGINAÇÃO
+    let loggedUser = { name: null, email: null };
+    let paginationState = {
+        currentPage: 1,
+        totalPages: 1,
+        itemsPerPage: 10, // Novo padrão de 10 itens por página
+        totalItems: 0
+    };
+
+    // -------------------------------------------------------------------------------------
+    // --- MAPEAMENTO FINAL: CHAVES BASEADAS NOS CABEÇALHOS DA SUA PLANILHA (para doGet) ---
+    // -------------------------------------------------------------------------------------
+    const headerMapping = {
+        'timestamp_envio': 'Data/Hora',     
+        'nome_solicitante': 'Solicitante',   
+        'email_solicitante': 'Email', 
+        'nome_do_paciente': 'Paciente',           
+        'data_de_nascimento': 'Nasc.',              
+        'setor_de_interesse': 'Setor/Serviço',       
+        'quantidade': 'QTD',                
+        'destino_do_material': 'Destino',
+        'mensagem': 'Material/Obs',      
+    };
+
+    // Ordem das chaves que serão exibidas na tabela
+    const displayedKeys = [
+        'timestamp_envio',
+        'nome_do_paciente',
+        'data_de_nascimento',
+        'setor_de_interesse',
+        'quantidade',
+        'destino_do_material',
+        'mensagem',
+        'nome_solicitante', 
+        'email_solicitante', 
+    ];
+
+    // -------------------------------------------------------------------
+    // --- FUNÇÕES DE INTERFACE E UTILIDADE ---
+    // -------------------------------------------------------------------
+
+    function showMainContent(userName, userEmail) {
+        loggedUser.name = userName;
+        loggedUser.email = userEmail;
+        
+        // Preenche os campos "read-only" do formulário de paciente
+        nomeSolicitanteInput.value = userName;
+        emailSolicitanteInput.value = userEmail;
+
+        authContainer.classList.add('hidden');
+        form.classList.remove('hidden');
+        headerSubtitle.textContent = `Bem-vindo(a), ${userName}! Preencha os campos com as informações da solicitação.`;
+
+        // Retorna o mainContent ao seu tamanho padrão
+        mainContent.classList.remove('sm:max-w-4xl');
+        mainContent.classList.add('sm:max-w-xl'); 
+    }
+
+    /**
+     * Gera o HTML das linhas da tabela de confirmação a partir dos dados.
+     */
+    function buildConfirmationTableRows(data) {
+        let html = '';
+        
+        // 🎯 CORREÇÃO: Usando os nomes da planilha (que foram renomeados no submit)
+        const displayMapping = {
+            'data_envio': 'Data/Hora do Envio',
+            'nome_solicitante': 'Solicitante',
+            'email_solicitante': 'E-mail Solicitante',
+            'nome_do_paciente': 'Paciente',        // CORRIGIDO
+            'data_de_nascimento': 'Nascimento',     // CORRIGIDO
+            'quantidade': 'Qtd. Solicitada',
+            'setor_de_interesse': 'Setor',         // CORRIGIDO
+            'destino_do_material': 'Destino',      // CORRIGIDO
+            'mensagem': 'Material/Instrumental',
+        };
+
+        for (const key in displayMapping) {
+            // Verifica se a chave existe na data, pois as chaves agora são as longas
+            if (data[key]) { 
+                const label = displayMapping[key];
+                let value = data[key];
+                
+                html += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-2 text-sm font-medium text-gray-900 w-1/3">${label}</td>
+                        <td class="px-4 py-2 text-sm text-gray-500 font-semibold w-2/3">${value}</td>
+                    </tr>
+                `;
+            }
+        }
+        return html;
+    }
+
+    /**
+     * Constrói a tabela da página atual dos registros.
+     */
+    function buildFullTable(data) {
+        if (data.length === 0) {
+            listTable.innerHTML = '';
+            return;
+        }
+        
+        // Construir o cabeçalho (<thead>)
+        let thead = '<thead><tr class="bg-gray-50">';
+        displayedKeys.forEach(key => {
+            const headerName = headerMapping[key] || key.toUpperCase();
+            thead += `<th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">${headerName}</th>`;
+        });
+        thead += '</tr></thead>';
+
+        // Construir o corpo (<tbody>)
+        let tbody = '<tbody class="divide-y divide-gray-100">';
+        data.forEach(row => {
+            tbody += '<tr class="bg-white hover:bg-indigo-50">';
+            displayedKeys.forEach(key => {
+                let cellContent = String(row[key] || '-');
+                
+                // Trunca a mensagem para visualização na tabela
+                if (key === 'mensagem' && cellContent.length > 30) {
+                    cellContent = cellContent.substring(0, 30) + '...';
+                }
+                
+                const cellClass = key === 'timestamp_envio' ? 'text-xs' : 'text-sm';
+
+                // O Apps Script já formatou data/hora para o padrão DD/MM/AAAA HH:MM:SS
+                tbody += `<td class="px-3 py-2 ${cellClass} text-gray-700">${cellContent}</td>`;
+            });
+            tbody += '</tr>';
+        });
+        tbody += '</tbody>';
+
+        listTable.innerHTML = thead + tbody;
+    }
+
+    /**
+     * Atualiza os botões de navegação e as informações da página.
+     */
+    function updatePaginationControls() {
+        prevPageButton.disabled = (paginationState.currentPage === 1);
+        nextPageButton.disabled = (paginationState.currentPage === paginationState.totalPages || paginationState.totalPages === 0);
+
+        const startItem = ((paginationState.currentPage - 1) * paginationState.itemsPerPage) + 1;
+        const endItem = Math.min(paginationState.currentPage * paginationState.itemsPerPage, paginationState.totalItems);
+        
+        if (paginationState.totalItems > 0) {
+             paginationInfo.textContent = `Página ${paginationState.currentPage} de ${paginationState.totalPages} (Total de ${paginationState.totalItems} itens)`;
+             paginationControls.classList.remove('hidden');
+        } else {
+             paginationInfo.textContent = '';
+             paginationControls.classList.add('hidden');
+        }
+    }
+
+    /**
+     * Busca e exibe a lista de registros, filtrada pelo usuário logado e paginada.
+     */
+    async function fetchAndDisplayList(page = 1) {
+        // Esconde outras telas
+        form.classList.add('hidden');
+        confirmationDiv.classList.add('hidden');
+        authContainer.classList.add('hidden'); 
+        
+        if (!loggedUser.email) {
+            alert('Erro: Usuário não logado. Por favor, faça login novamente.');
+            window.location.reload();
+            return;
+        }
+
+        // Define a página atual
+        paginationState.currentPage = page;
+
+        // Mostra a tela de lista
+        fullListContainer.classList.remove('hidden');
+        headerSubtitle.textContent = `Registros de ${loggedUser.name}`;
+        listTitle.textContent = `Registros de: ${loggedUser.email}`;
+        
+        // Ajusta o tamanho do container principal para a tabela
+        mainContent.classList.remove('sm:max-w-xl');
+        mainContent.classList.add('sm:max-w-4xl');
+
+        listStatusDiv.textContent = 'Carregando seus registros...';
+        listStatusDiv.className = 'text-center font-semibold p-3 rounded-lg bg-blue-100 text-blue-700';
+        listStatusDiv.classList.remove('hidden'); 
+        listTable.innerHTML = ''; 
+        paginationControls.classList.add('hidden');
+
+
+        // 💡 CRÍTICO: Constrói a URL com filtro de email, página e limite
+        const urlWithFilter = `${GOOGLE_SHEETS_WEB_APP_URL}?email=${encodeURIComponent(loggedUser.email)}&page=${page}&limit=${paginationState.itemsPerPage}`;
+
+        try {
+            // Requisição GET para buscar os dados.
+            const response = await fetch(urlWithFilter, { 
+                method: 'GET'
+            });
+
+            if (!response.ok) {
+                throw new Error(`Erro de rede: ${response.status} ${response.statusText}`);
+            }
+
+            const result = await response.json();
+
+            if (result.result === 'success') {
+                
+                // 1. Atualiza o estado da paginação
+                paginationState.totalPages = result.totalPages;
+                paginationState.totalItems = result.totalItems;
+
+                if (result.data && result.data.length > 0) {
+                    listStatusDiv.classList.add('hidden');
+                    buildFullTable(result.data);
+                    updatePaginationControls();
+                    window.scrollTo(0, 0); // Rola para o topo da página após carregar
+                } else {
+                    // Se não houver dados na página atual, mas houver páginas no total (erro lógico, volta para pág 1)
+                     if (paginationState.totalItems > 0 && page > paginationState.totalPages) {
+                         fetchAndDisplayList(paginationState.totalPages);
+                         return;
+                     }
+                    
+                    listStatusDiv.textContent = paginationState.totalItems === 0
+                        ? 'Nenhum registro encontrado associado ao seu e-mail.'
+                        : 'Nenhum registro encontrado para a página atual.';
+
+                    listStatusDiv.className = 'text-center font-semibold p-3 rounded-lg bg-yellow-100 text-yellow-700';
+                    updatePaginationControls(); // Atualiza botões mesmo sem dados.
+                }
+            } else {
+                throw new Error(result.message || 'Erro desconhecido ao buscar dados no Apps Script.');
+            }
+
+        } catch (error) {
+            console.error('Erro ao buscar a lista:', error);
+            listStatusDiv.textContent = `❌ Erro ao carregar a lista: ${error.message}. Verifique a URL e a implantação do Apps Script.`;
+            listStatusDiv.className = 'text-center font-semibold p-3 rounded-lg bg-red-100 text-red-700';
+            paginationControls.classList.add('hidden');
+        }
+    }
+
+    /**
+     * Limpa os campos de input do formulário principal, exceto os campos
+     * do solicitante (que são preenchidos no login).
+     */
+    function clearForm() {
+        // 🎯 CORREÇÃO: Usando os IDs/Nomes corretos do HTML
+        document.getElementById('nome_paciente').value = ''; 
+        document.getElementById('data_nascimento').value = ''; 
+        document.getElementById('quantidade').value = '1'; 
+        
+        const setorInput = document.getElementById('setor_interesse'); // CORRIGIDO
+        if (setorInput && setorInput.tagName === 'SELECT') {
+             setorInput.selectedIndex = 0; 
+        } else if (setorInput) {
+             setorInput.value = '';
+        }
+        
+        document.getElementById('mensagem').value = '';
+
+        // Limpa a seleção de radio buttons para 'destino_material' (CORRIGIDO)
+        document.querySelectorAll('input[name="destino_material"]').forEach(radio => {
+            radio.checked = false;
+        });
+    }
+
+    // -------------------------------------------------------------------
+    // --- FUNÇÃO DE VALIDAÇÃO DE SENHA (ADICIONADA) ---
+    // -------------------------------------------------------------------
+
+    function validatePassword(password) {
+        // Validação: Pelo menos uma letra (maiúscula ou minúscula) é obrigatória
+        const hasLetter = /[a-zA-Z]/.test(password);
+        
+        if (!hasLetter) {
+            return {
+                isValid: false,
+                message: 'A senha deve conter pelo menos uma letra (A-Z ou a-z).',
+            };
+        }
+        // Se desejar outras validações (ex: comprimento mínimo, números, etc.), adicione-as aqui.
+        
+        return { isValid: true };
+    }
+
+    // -------------------------------------------------------------------
+    // --- LISTENERS DE EVENTOS ---
+    // -------------------------------------------------------------------
+    
+    // Botões de Paginação
+    prevPageButton.addEventListener('click', () => {
+        if (paginationState.currentPage > 1) {
+            fetchAndDisplayList(paginationState.currentPage - 1);
+        }
+    });
+
+    nextPageButton.addEventListener('click', () => {
+        if (paginationState.currentPage < paginationState.totalPages) {
+            fetchAndDisplayList(paginationState.currentPage + 1);
+        }
+    });
+
+
+    // Listeners de Autenticação/Formulário (Mantidos)
+    document.getElementById('showRegisterButton').addEventListener('click', () => {
+         loginForm.classList.add('hidden');
+         registerForm.classList.remove('hidden');
+         loginStatusDiv.textContent = '';
+         headerSubtitle.textContent = 'Crie um novo usuário para acessar o sistema.';
+    });
+
+    document.getElementById('backToLoginButton').addEventListener('click', () => {
+         registerForm.classList.add('hidden');
+         loginForm.classList.remove('hidden');
+         registerStatusDiv.textContent = '';
+         headerSubtitle.textContent = 'Use seu email e senha para acessar.';
+    });
+
+    // 1. Envio do Formulário de CADASTRO (POST: action=register)
+    registerForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const passwordInput = document.getElementById('registerPassword');
+        const passwordValue = passwordInput ? passwordInput.value : '';
+
+        // --- VALIDAÇÃO DE SENHA (ADICIONADA) ---
+        const validation = validatePassword(passwordValue);
+
+        if (!validation.isValid) {
+            registerStatusDiv.textContent = `❌ Erro de senha: ${validation.message}`;
+            registerStatusDiv.className = 'bg-red-100 text-red-700';
+            document.getElementById('registerButton').disabled = false;
+            return; // Impede o envio do formulário
+        }
+        // ----------------------------------------
+
+        registerStatusDiv.textContent = 'Cadastrando usuário...';
+        registerStatusDiv.className = 'bg-blue-100 text-blue-700';
+        document.getElementById('registerButton').disabled = true;
+
+        const formData = new FormData(registerForm);
+        formData.append('action', 'register'); 
+        
+        try {
+            const response = await fetch(GOOGLE_SHEETS_WEB_APP_URL, { method: 'POST', body: formData });
+            const result = await response.json();
+
+            if (result.result === 'success') {
+                registerStatusDiv.textContent = '✅ Cadastro realizado com sucesso! Acessando...';
+                registerStatusDiv.className = 'bg-green-100 text-green-700';
+                setTimeout(() => showMainContent(result.user, result.email), 1500); 
+            } else {
+                registerStatusDiv.textContent = `❌ Erro no cadastro: ${result.message || 'E-mail já cadastrado.'}`;
+                registerStatusDiv.className = 'bg-red-100 text-red-700';
+            }
+        } catch (error) {
+            console.error('Erro de requisição:', error);
+            registerStatusDiv.textContent = '❌ Erro de conexão. Verifique a URL e a implantação do Apps Script.';
+            registerStatusDiv.className = 'bg-red-100 text-red-700';
+        } finally {
+            document.getElementById('registerButton').disabled = false;
+        }
+    });
+
+    // 2. Envio do Formulário de LOGIN (POST: action=login)
+    loginForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        loginStatusDiv.textContent = 'Verificando credenciais...';
+        loginStatusDiv.className = 'bg-blue-100 text-blue-700';
+        document.getElementById('loginButton').disabled = true;
+
+        const formData = new FormData(loginForm);
+        formData.append('action', 'login'); 
+
+        try {
+            const response = await fetch(GOOGLE_SHEETS_WEB_APP_URL, { method: 'POST', body: formData });
+            const result = await response.json();
+
+            if (result.result === 'success') {
+                loginStatusDiv.textContent = `👋 Bem-vindo(a), ${result.user}! Acesso liberado.`;
+                loginStatusDiv.className = 'bg-green-100 text-green-700';
+                setTimeout(() => showMainContent(result.user, result.email), 1500); 
+            } else {
+                loginStatusDiv.textContent = `❌ ${result.message || 'E-mail ou senha incorretos.'}`;
+                loginStatusDiv.className = 'bg-red-100 text-red-700';
+            }
+        } catch (error) {
+            console.error('Erro de requisição:', error);
+            loginStatusDiv.textContent = '❌ Erro de conexão (Failed to fetch). Verifique a URL do Apps Script.';
+            loginStatusDiv.className = 'bg-red-100 text-red-700';
+        } finally {
+            document.getElementById('loginButton').disabled = false;
+            setTimeout(() => { loginStatusDiv.textContent = ''; loginStatusDiv.className = ''; }, 5000);
+        }
+    });
+
+    // 3. Envio do Formulário de Paciente (POST: action=saveRecord)
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault(); 
+        
+        statusDiv.textContent = 'Enviando dados...';
+        statusDiv.className = 'bg-blue-100 text-blue-700';
+        submitButton.disabled = true;
+        submitButton.innerHTML = 'Aguarde...';
+
+        const formData = new FormData(form);
+        
+        // 💡 FORMATANDO DATA E HORA PARA O PADRÃO BRASILEIRO NO HTML
+        const timestamp = new Date().toLocaleString("pt-BR", { 
+            timeZone: 'America/Sao_Paulo',
+            day: '2-digit', month: '2-digit', year: 'numeric', 
+            hour: '2-digit', minute: '2-digit', second: '2-digit' 
+        });
+
+        // 🎯 CRÍTICO: Renomeando campos curtos do HTML para os nomes longos da planilha
+        
+        // 1. Renomeia Paciente (nome_paciente -> nome_do_paciente)
+        const nomePaciente = formData.get('nome_paciente');
+        formData.set('nome_do_paciente', nomePaciente);
+        formData.delete('nome_paciente');
+
+        // 2. Renomeia Setor (setor_interesse -> setor_de_interesse)
+        const setorInteresse = formData.get('setor_interesse');
+        formData.set('setor_de_interesse', setorInteresse);
+        formData.delete('setor_interesse');
+
+        // 3. Renomeia Destino (destino_material -> destino_do_material)
+        const destinoMaterial = formData.get('destino_material');
+        formData.set('destino_do_material', destinoMaterial);
+        formData.delete('destino_material');
+
+        // 4. Renomeia e Formata Data de Nascimento (data_nascimento -> data_de_nascimento)
+        const rawDate = formData.get('data_nascimento'); 
+        let formattedDateForSheet = rawDate; 
+        if (rawDate && rawDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
+            const parts = rawDate.split('-'); 
+            formattedDateForSheet = `${parts[2]}/${parts[1]}/${parts[0]}`; 
+        }
+        formData.set('data_de_nascimento', formattedDateForSheet); 
+        formData.delete('data_nascimento'); 
+        
+        // Adiciona campos de controle para o Apps Script
+        formData.append('action', 'saveRecord'); 
+        formData.append('data_envio', timestamp); 
+        
+        // Converte para objeto APÓS renomear e adicionar campos
+        const rawData = Object.fromEntries(formData.entries()); 
+        
+        try {
+            const response = await fetch(GOOGLE_SHEETS_WEB_APP_URL, { method: 'POST', body: formData });
+            const result = await response.json();
+            
+            if (result.result === 'success') {
+                form.classList.add('hidden');
+                confirmationDiv.classList.remove('hidden');
+                statusDiv.textContent = '';
+                statusDiv.className = '';
+
+                // O rawData AGORA contém os nomes corretos para exibição (nome_do_paciente, data_de_nascimento, etc.)
+                const displayData = { 
+                    ...rawData, 
+                    data_envio: timestamp
+                };
+
+                dataTableBody.innerHTML = buildConfirmationTableRows(displayData);
+                
+                // Limpa o formulário APÓS o sucesso.
+                clearForm(); 
+                
+            } else {
+                statusDiv.textContent = `❌ Falha no envio: ${result.message || 'Erro desconhecido. Verifique o Apps Script.'}`;
+                statusDiv.className = 'bg-red-100 text-red-700';
+            }
+
+        } catch (error) {
+            console.error('Erro na requisição:', error);
+            statusDiv.textContent = '❌ Erro de conexão. Verifique se a URL está correta.';
+            statusDiv.className = 'bg-red-100 text-red-700';
+        } finally {
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<span class="text-lg">Enviar Registro</span>';
+            
+            setTimeout(() => {
+                statusDiv.textContent = '';
+                statusDiv.className = '';
+            }, 5000);
+        }
+    });
+
+    // 4. Botão "Ver Lista" (na tela do Formulário) - Inicia na página 1
+    viewListButton.addEventListener('click', () => fetchAndDisplayList(1));
+
+    // 5. Botão "Ver Lista" (na tela de Confirmação) - Inicia na página 1
+    viewListButton2.addEventListener('click', () => fetchAndDisplayList(1));
+    
+    // 6. Botão "Voltar ao Formulário" (na tela de Lista)
+    backToFormButton.addEventListener('click', () => {
+        fullListContainer.classList.add('hidden');
+        form.classList.remove('hidden');
+        headerSubtitle.textContent = `Bem-vindo(a), ${loggedUser.name}! Preencha os campos com as informações da solicitação.`; 
+        
+        mainContent.classList.remove('sm:max-w-4xl');
+        mainContent.classList.add('sm:max-w-xl'); 
+    });
+    
+    // 7. NOVO: Botão "Fazer Novo Registro" (na tela de Confirmação)
+    newRecordButton.addEventListener('click', () => {
+        confirmationDiv.classList.add('hidden'); // Esconde a confirmação
+        form.classList.remove('hidden'); // Mostra o formulário
+        
+        headerSubtitle.textContent = `Bem-vindo(a), ${loggedUser.name}! Preencha os campos com as informações da solicitação.`; 
+        
+        mainContent.classList.remove('sm:max-w-4xl');
+        mainContent.classList.add('sm:max-w-xl');
+    });
+
+</script>
+</body>
+</html>
